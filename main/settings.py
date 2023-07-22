@@ -12,15 +12,19 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from .utils import load_env
+
+
+get_env = os.environ.get
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
+load_env(BASE_DIR / '.env')
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-fc*_!8&h*i@a#lx8ms%=v#fx22@mzr*nbfuoak1wqwe-wspd0+'
+SECRET_KEY = get_env("SECRET_KEY", "secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -88,12 +92,15 @@ CORS_ALLOWED_ORIGINS = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'URL': os.getenv('DATABASE_URL'),
-        'NAME': os.getenv('PGNAME'),
-        'USER': os.getenv('PGUSER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('PGHOST'),
-        'PORT': os.getenv('PGPORT'),
+        'URL': get_env('DATABASE_URL', 'postgres://postgres:postgres@localhost:5432/facemark'),
+        'NAME': get_env('PGDATABASE', 'facemark'),
+        'USER': get_env('PGUSER', 'postgres'),
+        'PASSWORD': get_env('PGPASSWORD', 'postgres'),
+        'HOST': get_env('PGHOST', 'localhost'),
+        'PORT': get_env('PGPORT', '5432'),
+        'OPTIONS': {
+            'sslmode': get_env('DATABASE_SSLMODE', 'disable'),
+        },
     }
 }
 
